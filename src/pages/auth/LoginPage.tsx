@@ -22,51 +22,60 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-svh items-center justify-center bg-muted/40 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold text-xl">
-            SV
+    <div className="flex min-h-svh items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 p-4">
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center">
+          <div className="relative mx-auto h-16 w-16 mb-6">
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600" />
+            <div className="absolute inset-[4px] rounded-full bg-slate-900" />
+            <div className="absolute inset-[8px] rounded-full bg-gradient-to-br from-indigo-400 to-indigo-500" />
           </div>
-          <CardTitle className="text-2xl">SV Oranje</CardTitle>
-          <CardDescription>Volunteer Credit Platform — Demo Login</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label>Role</Label>
-            <Select value={role} onValueChange={(v: Role) => { setRole(v); setUserId('') }}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="volunteer">Volunteer</SelectItem>
-                <SelectItem value="admin">Club Admin</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>User</Label>
-            <Select value={userId} onValueChange={setUserId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a user..." />
-              </SelectTrigger>
-              <SelectContent>
-                {users.map((u) => (
-                  <SelectItem key={u.id} value={u.id}>
-                    {u.firstName} {u.lastName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <Button className="w-full" onClick={handleLogin} disabled={!userId}>
-            Log in
-          </Button>
-          <p className="text-center text-xs text-muted-foreground">
-            This is a demo — no real authentication is performed.
-          </p>
-        </CardContent>
-      </Card>
+          <h1 className="text-2xl font-bold text-white tracking-tight">SV Oranje</h1>
+          <p className="text-sm text-slate-400 mt-1">Volunteer Credit Platform</p>
+        </div>
+
+        <Card className="shadow-xl border-border/50">
+          <CardHeader className="text-center pb-2">
+            <CardTitle className="text-lg">Sign in to your account</CardTitle>
+            <CardDescription>Select a role and user to continue</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Role</Label>
+              <Select value={role} onValueChange={(v: Role) => { setRole(v); setUserId('') }}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="volunteer">Volunteer</SelectItem>
+                  <SelectItem value="admin">Club Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">User</Label>
+              <Select value={userId} onValueChange={setUserId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a user..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {users.map((u) => (
+                    <SelectItem key={u.id} value={u.id}>
+                      {u.firstName} {u.lastName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button className="w-full" onClick={handleLogin} disabled={!userId}>
+              Continue
+            </Button>
+            <p className="text-center text-xs text-muted-foreground pt-1">
+              This is a demo — no real authentication is performed.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

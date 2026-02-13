@@ -12,20 +12,20 @@ interface StatCardProps {
 
 export function StatCard({ icon: Icon, label, value, trend, className }: StatCardProps) {
   return (
-    <Card className={cn('transition-shadow hover:shadow-md', className)}>
-      <CardContent className="p-6">
+    <Card className={cn('transition-all hover:shadow-md border-border/60', className)}>
+      <CardContent className="p-5">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">{label}</p>
-            <p className="text-2xl font-bold">{value}</p>
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
+            <p className="text-2xl font-semibold tracking-tight">{value}</p>
             {trend && (
-              <p className={cn('text-xs font-medium', trend.positive ? 'text-green-600' : 'text-red-600')}>
+              <p className={cn('text-xs font-medium', trend.positive ? 'text-emerald-600' : 'text-red-500')}>
                 {trend.value}
               </p>
             )}
           </div>
-          <div className="rounded-full bg-primary/10 p-3">
-            <Icon className="h-6 w-6 text-primary" />
+          <div className="rounded-lg bg-primary/8 p-2.5">
+            <Icon className="h-5 w-5 text-primary" />
           </div>
         </div>
       </CardContent>

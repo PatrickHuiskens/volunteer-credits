@@ -31,10 +31,10 @@ export function TopBar({ title }: { title: string }) {
   const initials = `${currentUser.firstName[0]}${currentUser.lastName[0]}`
 
   return (
-    <header className="flex h-14 items-center gap-3 border-b bg-background px-4">
+    <header className="flex h-14 items-center gap-3 border-b border-border/60 bg-card px-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.03)]">
       <SidebarTrigger />
       <Separator orientation="vertical" className="h-6" />
-      <h1 className="text-lg font-semibold flex-1">{title}</h1>
+      <h1 className="text-base font-semibold tracking-tight flex-1">{title}</h1>
 
       <DropdownMenu open={notifOpen} onOpenChange={setNotifOpen}>
         <DropdownMenuTrigger asChild>
