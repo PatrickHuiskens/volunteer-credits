@@ -133,7 +133,7 @@ export default function AdminTaskDetail() {
                 <p className="text-sm text-muted-foreground">No volunteers assigned</p>
               ) : (
                 assignedVols.map((v) => (
-                  <div key={v.id} className="flex items-center gap-3">
+                  <div key={v.id} className="flex items-center gap-3 cursor-pointer rounded-lg p-2 -mx-2 hover:bg-muted/50 transition-colors" onClick={() => navigate(`/admin/members/${v.id}`)}>
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="text-xs">
                         {v.firstName[0]}

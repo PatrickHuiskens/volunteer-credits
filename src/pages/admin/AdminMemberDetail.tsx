@@ -100,7 +100,7 @@ export default function AdminMemberDetail() {
               ) : (
                 <div className="space-y-2">
                   {memberTasks.slice(0, 5).map((t) => (
-                    <div key={t.id} className="flex items-center justify-between text-sm">
+                    <div key={t.id} className="flex items-center justify-between text-sm cursor-pointer rounded-lg p-2 -mx-2 hover:bg-muted/50 transition-colors" onClick={() => navigate(`/admin/tasks/${t.id}`)}>
                       <span className="font-medium">{t.title}</span>
                       <div className="flex items-center gap-2">
                         <CreditBadge amount={t.creditReward} size="sm" />

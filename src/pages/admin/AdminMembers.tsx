@@ -53,7 +53,7 @@ export default function AdminMembers() {
               {filtered.map((v) => (
                 <TableRow
                   key={v.id}
-                  className="cursor-pointer"
+                  className="cursor-pointer hover:bg-muted/50 transition-colors"
                   onClick={() => navigate(`/admin/members/${v.id}`)}
                 >
                   <TableCell>

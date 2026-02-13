@@ -19,10 +19,37 @@ import {
   PieChart,
   Pie,
   Cell,
+  Legend,
 } from 'recharts'
 import { CATEGORY_CONFIG } from '@/lib/constants'
 
-const CHART_COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#8b5cf6', '#ec4899', '#64748b']
+const CHART_COLORS = ['#6366f1', '#22c55e', '#f59e0b', '#8b5cf6', '#ec4899', '#64748b']
+
+function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ name: string; value: number; color: string }>; label?: string }) {
+  if (!active || !payload?.length) return null
+  return (
+    <div className="rounded-lg border bg-card p-3 shadow-lg">
+      <p className="text-sm font-medium mb-1.5">{label}</p>
+      {payload.map((entry, i) => (
+        <div key={i} className="flex items-center gap-2 text-sm">
+          <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
+          <span className="text-muted-foreground">{entry.name}:</span>
+          <span className="font-medium">{entry.value} CR</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function PieTooltip({ active, payload }: { active?: boolean; payload?: Array<{ name: string; value: number; payload: { name: string } }> }) {
+  if (!active || !payload?.length) return null
+  return (
+    <div className="rounded-lg border bg-card p-3 shadow-lg">
+      <p className="text-sm font-medium">{payload[0].payload.name}</p>
+      <p className="text-sm text-muted-foreground">{payload[0].value} tasks</p>
+    </div>
+  )
+}
 
 export default function AdminDashboard() {
   const { club, volunteers, transactions, tasks } = useData()
@@ -67,13 +94,14 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" fontSize={12} />
-                <YAxis fontSize={12} />
-                <Tooltip />
-                <Bar dataKey="earned" fill="#22c55e" name="Earned" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="spent" fill="#ef4444" name="Spent" radius={[4, 4, 0, 0]} />
+              <BarChart data={monthlyData} barGap={4}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.5} vertical={false} />
+                <XAxis dataKey="month" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}`} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted))', opacity: 0.5 }} />
+                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
+                <Bar dataKey="earned" fill="#22c55e" name="Earned" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="spent" fill="#ef4444" name="Spent" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -90,15 +118,18 @@ export default function AdminDashboard() {
                   data={categoryData}
                   cx="50%"
                   cy="50%"
+                  innerRadius={55}
                   outerRadius={100}
                   dataKey="value"
-                  label={({ name, value }) => `${name} (${value})`}
+                  paddingAngle={3}
+                  strokeWidth={0}
                 >
                   {categoryData.map((_, index) => (
                     <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip content={<PieTooltip />} />
+                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
@@ -150,7 +181,7 @@ export default function AdminDashboard() {
             {recentTransactions.map((tx) => {
               const vol = volunteers.find((v) => v.id === tx.userId)
               return (
-                <div key={tx.id} className="flex items-center justify-between">
+                <div key={tx.id} className="flex items-center justify-between cursor-pointer rounded-lg p-2 -mx-2 hover:bg-muted/50 transition-colors" onClick={() => navigate('/admin/transactions')}>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium truncate">{tx.description}</p>
                     <p className="text-xs text-muted-foreground">

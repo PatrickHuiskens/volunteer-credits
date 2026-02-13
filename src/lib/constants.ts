@@ -7,6 +7,7 @@ import {
   ClipboardList,
   LayoutDashboard,
   ListTodo,
+  CalendarDays,
   ShoppingBag,
   Receipt,
   UserCircle,
@@ -124,6 +125,7 @@ export interface NavItem {
 export const VOLUNTEER_NAV: NavItem[] = [
   { title: 'Dashboard', url: '/volunteer', icon: LayoutDashboard },
   { title: 'Tasks', url: '/volunteer/tasks', icon: ListTodo },
+  { title: 'Agenda', url: '/volunteer/agenda', icon: CalendarDays },
   { title: 'Shop', url: '/volunteer/shop', icon: ShoppingBag },
   { title: 'Transactions', url: '/volunteer/transactions', icon: Receipt },
   { title: 'Profile', url: '/volunteer/profile', icon: UserCircle },
@@ -132,6 +134,7 @@ export const VOLUNTEER_NAV: NavItem[] = [
 export const ADMIN_NAV: NavItem[] = [
   { title: 'Dashboard', url: '/admin', icon: LayoutDashboard },
   { title: 'Tasks', url: '/admin/tasks', icon: ListTodo },
+  { title: 'Agenda', url: '/admin/agenda', icon: CalendarDays },
   { title: 'Members', url: '/admin/members', icon: Users },
   { title: 'Transactions', url: '/admin/transactions', icon: Receipt },
   { title: 'Settings', url: '/admin/settings', icon: Settings },

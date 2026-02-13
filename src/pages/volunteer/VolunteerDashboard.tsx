@@ -80,7 +80,7 @@ export default function VolunteerDashboard() {
             ) : (
               <div className="space-y-3">
                 {myTransactions.map((tx) => (
-                  <div key={tx.id} className="flex items-center justify-between">
+                  <div key={tx.id} className="flex items-center justify-between cursor-pointer rounded-lg p-2 -mx-2 hover:bg-muted/50 transition-colors" onClick={() => navigate('/volunteer/transactions')}>
                     <div>
                       <p className="text-sm font-medium">{tx.description}</p>
                       <p className="text-xs text-muted-foreground">{formatDate(tx.date)}</p>

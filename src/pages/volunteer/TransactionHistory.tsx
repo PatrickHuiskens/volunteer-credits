@@ -64,7 +64,7 @@ export default function TransactionHistory() {
                 </TableHeader>
                 <TableBody>
                   {withBalance.map((tx) => (
-                    <TableRow key={tx.id}>
+                    <TableRow key={tx.id} className="hover:bg-muted/50 transition-colors">
                       <TableCell className="text-sm">{formatDate(tx.date)}</TableCell>
                       <TableCell className="text-sm font-medium">{tx.description}</TableCell>
                       <TableCell className="text-right">

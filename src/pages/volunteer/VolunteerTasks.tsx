@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
-import { ListTodo } from 'lucide-react'
+import { ListTodo, Search } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
 import { TaskCard } from '@/components/shared/TaskCard'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { EmptyState } from '@/components/shared/EmptyState'
@@ -17,18 +18,26 @@ export default function VolunteerTasks() {
   const { tasks, signUpForTask, cancelTaskSignUp } = useData()
   const navigate = useNavigate()
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
+  const [search, setSearch] = useState('')
   const userId = currentUser!.id
 
   const filterByCategory = (taskList: typeof tasks) =>
     categoryFilter === 'all' ? taskList : taskList.filter((t) => t.category === categoryFilter)
 
-  const availableTasks = filterByCategory(
+  const filterBySearch = (taskList: typeof tasks) =>
+    search === '' ? taskList : taskList.filter((t) =>
+      `${t.title} ${t.description} ${t.location}`.toLowerCase().includes(search.toLowerCase())
+    )
+
+  const applyFilters = (taskList: typeof tasks) => filterBySearch(filterByCategory(taskList))
+
+  const availableTasks = applyFilters(
     tasks.filter((t) => t.status === TaskStatus.OPEN && !t.assignedVolunteerIds.includes(userId))
   )
-  const myTasks = filterByCategory(
+  const myTasks = applyFilters(
     tasks.filter((t) => t.assignedVolunteerIds.includes(userId) && t.status !== TaskStatus.COMPLETED)
   )
-  const completedTasks = filterByCategory(
+  const completedTasks = applyFilters(
     tasks.filter((t) => t.assignedVolunteerIds.includes(userId) && t.status === TaskStatus.COMPLETED)
   )
 
@@ -47,6 +56,15 @@ export default function VolunteerTasks() {
       <PageHeader title="Tasks" description="Browse and sign up for volunteer tasks" />
 
       <div className="flex items-center gap-3">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search tasks..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
           <SelectTrigger className="w-48">
             <SelectValue placeholder="All categories" />

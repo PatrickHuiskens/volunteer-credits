@@ -147,7 +147,7 @@ export default function AdminTasks() {
                 return (
                   <TableRow
                     key={task.id}
-                    className="cursor-pointer"
+                    className="cursor-pointer hover:bg-muted/50 transition-colors"
                     onClick={() => navigate(`/admin/tasks/${task.id}`)}
                   >
                     <TableCell className="font-medium">{task.title}</TableCell>

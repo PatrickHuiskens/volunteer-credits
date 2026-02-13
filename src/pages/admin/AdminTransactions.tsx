@@ -61,7 +61,7 @@ export default function AdminTransactions() {
                   {filtered.map((tx) => {
                     const vol = volunteers.find((v) => v.id === tx.userId)
                     return (
-                      <TableRow key={tx.id}>
+                      <TableRow key={tx.id} className="hover:bg-muted/50 transition-colors">
                         <TableCell className="text-sm">{formatDate(tx.date)}</TableCell>
                         <TableCell className="text-sm font-medium">
                           {vol ? `${vol.firstName} ${vol.lastName}` : 'Unknown'}

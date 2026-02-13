@@ -65,7 +65,7 @@ export default function CreditShop() {
                     return (
                       <Card
                         key={item.id}
-                        className={cn('transition-shadow hover:shadow-md', !item.isAvailable && 'opacity-60')}
+                        className={cn('transition-all hover:shadow-md border-border/60', !item.isAvailable && 'opacity-60')}
                       >
                         <CardHeader className="pb-3">
                           <div className="flex items-center justify-between">
