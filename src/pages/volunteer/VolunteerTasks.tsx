@@ -15,7 +15,7 @@ import { toast } from 'sonner'
 
 export default function VolunteerTasks() {
   const { currentUser } = useAuth()
-  const { tasks, signUpForTask, cancelTaskSignUp } = useData()
+  const { tasks, signUpForTask, cancelTaskSignUp, joinWaitlist, leaveWaitlist } = useData()
   const navigate = useNavigate()
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [search, setSearch] = useState('')
@@ -49,6 +49,16 @@ export default function VolunteerTasks() {
   const handleCancel = (taskId: string) => {
     cancelTaskSignUp(taskId, userId)
     toast.info('Cancelled task sign-up')
+  }
+
+  const handleJoinWaitlist = (taskId: string) => {
+    joinWaitlist(taskId, userId)
+    toast.success('Joined the waitlist!')
+  }
+
+  const handleLeaveWaitlist = (taskId: string) => {
+    leaveWaitlist(taskId, userId)
+    toast.info('Left the waitlist')
   }
 
   return (
@@ -91,15 +101,23 @@ export default function VolunteerTasks() {
           {availableTasks.length === 0 ? (
             <EmptyState icon={ListTodo} title="No available tasks" description="Check back later for new volunteer opportunities." />
           ) : (
-            availableTasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                showSignUp
-                onSignUp={() => handleSignUp(task.id)}
-                onClick={() => navigate(`/volunteer/tasks/${task.id}`)}
-              />
-            ))
+            availableTasks.map((task) => {
+              const isOnWaitlist = task.waitlistVolunteerIds.includes(userId)
+              const waitlistPosition = isOnWaitlist ? task.waitlistVolunteerIds.indexOf(userId) + 1 : 0
+              return (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  showSignUp
+                  isOnWaitlist={isOnWaitlist}
+                  waitlistPosition={waitlistPosition}
+                  onSignUp={() => handleSignUp(task.id)}
+                  onJoinWaitlist={() => handleJoinWaitlist(task.id)}
+                  onLeaveWaitlist={() => handleLeaveWaitlist(task.id)}
+                  onClick={() => navigate(`/volunteer/tasks/${task.id}`)}
+                />
+              )
+            })
           )}
         </TabsContent>
 

@@ -14,6 +14,7 @@ export const mockTasks: Task[] = [
     status: TaskStatus.OPEN,
     maxVolunteers: 3,
     assignedVolunteerIds: ['vol-1'],
+    waitlistVolunteerIds: [],
   },
   {
     id: 'task-2',
@@ -28,6 +29,7 @@ export const mockTasks: Task[] = [
     status: TaskStatus.OPEN,
     maxVolunteers: 4,
     assignedVolunteerIds: ['vol-2', 'vol-4'],
+    waitlistVolunteerIds: [],
   },
   {
     id: 'task-3',
@@ -42,6 +44,7 @@ export const mockTasks: Task[] = [
     status: TaskStatus.OPEN,
     maxVolunteers: 6,
     assignedVolunteerIds: ['vol-1', 'vol-3', 'vol-7'],
+    waitlistVolunteerIds: [],
   },
   {
     id: 'task-4',
@@ -56,6 +59,7 @@ export const mockTasks: Task[] = [
     status: TaskStatus.OPEN,
     maxVolunteers: 2,
     assignedVolunteerIds: [],
+    waitlistVolunteerIds: [],
   },
   {
     id: 'task-5',
@@ -70,6 +74,7 @@ export const mockTasks: Task[] = [
     status: TaskStatus.OPEN,
     maxVolunteers: 5,
     assignedVolunteerIds: ['vol-2', 'vol-6'],
+    waitlistVolunteerIds: [],
   },
   {
     id: 'task-6',
@@ -84,6 +89,7 @@ export const mockTasks: Task[] = [
     status: TaskStatus.OPEN,
     maxVolunteers: 2,
     assignedVolunteerIds: ['vol-8'],
+    waitlistVolunteerIds: [],
   },
   {
     id: 'task-7',
@@ -98,6 +104,7 @@ export const mockTasks: Task[] = [
     status: TaskStatus.IN_PROGRESS,
     maxVolunteers: 2,
     assignedVolunteerIds: ['vol-5', 'vol-9'],
+    waitlistVolunteerIds: ['vol-1', 'vol-3'],
   },
   {
     id: 'task-8',
@@ -112,6 +119,7 @@ export const mockTasks: Task[] = [
     status: TaskStatus.COMPLETED,
     maxVolunteers: 4,
     assignedVolunteerIds: ['vol-1', 'vol-3', 'vol-7', 'vol-10'],
+    waitlistVolunteerIds: [],
   },
   {
     id: 'task-9',
@@ -126,6 +134,7 @@ export const mockTasks: Task[] = [
     status: TaskStatus.OPEN,
     maxVolunteers: 4,
     assignedVolunteerIds: [],
+    waitlistVolunteerIds: [],
   },
   {
     id: 'task-10',
@@ -140,6 +149,7 @@ export const mockTasks: Task[] = [
     status: TaskStatus.COMPLETED,
     maxVolunteers: 5,
     assignedVolunteerIds: ['vol-2', 'vol-4', 'vol-6', 'vol-8'],
+    waitlistVolunteerIds: [],
   },
   {
     id: 'task-11',
@@ -154,6 +164,7 @@ export const mockTasks: Task[] = [
     status: TaskStatus.OPEN,
     maxVolunteers: 3,
     assignedVolunteerIds: [],
+    waitlistVolunteerIds: [],
   },
   {
     id: 'task-12',
@@ -168,6 +179,7 @@ export const mockTasks: Task[] = [
     status: TaskStatus.COMPLETED,
     maxVolunteers: 2,
     assignedVolunteerIds: ['vol-6', 'vol-10'],
+    waitlistVolunteerIds: [],
   },
   {
     id: 'task-13',
@@ -182,6 +194,7 @@ export const mockTasks: Task[] = [
     status: TaskStatus.OPEN,
     maxVolunteers: 3,
     assignedVolunteerIds: ['vol-4'],
+    waitlistVolunteerIds: [],
   },
   {
     id: 'task-14',
@@ -196,6 +209,7 @@ export const mockTasks: Task[] = [
     status: TaskStatus.CANCELLED,
     maxVolunteers: 3,
     assignedVolunteerIds: ['vol-3'],
+    waitlistVolunteerIds: [],
   },
   {
     id: 'task-15',
@@ -210,5 +224,6 @@ export const mockTasks: Task[] = [
     status: TaskStatus.OPEN,
     maxVolunteers: 2,
     assignedVolunteerIds: [],
+    waitlistVolunteerIds: [],
   },
 ]

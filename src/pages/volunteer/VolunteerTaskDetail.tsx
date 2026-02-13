@@ -16,7 +16,7 @@ export default function VolunteerTaskDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { currentUser } = useAuth()
-  const { tasks, volunteers, signUpForTask, cancelTaskSignUp } = useData()
+  const { tasks, volunteers, signUpForTask, cancelTaskSignUp, joinWaitlist, leaveWaitlist } = useData()
 
   const task = tasks.find((t) => t.id === id)
   if (!task) return <div className="p-8 text-center">Task not found</div>
@@ -25,6 +25,8 @@ export default function VolunteerTaskDetail() {
   const status = STATUS_CONFIG[task.status]
   const CategoryIcon = category.icon
   const isSignedUp = task.assignedVolunteerIds.includes(currentUser!.id)
+  const isOnWaitlist = task.waitlistVolunteerIds.includes(currentUser!.id)
+  const waitlistPosition = isOnWaitlist ? task.waitlistVolunteerIds.indexOf(currentUser!.id) + 1 : 0
   const spotsLeft = task.maxVolunteers - task.assignedVolunteerIds.length
   const assignedVols = volunteers.filter((v) => task.assignedVolunteerIds.includes(v.id))
 
@@ -36,6 +38,16 @@ export default function VolunteerTaskDetail() {
   const handleCancel = () => {
     cancelTaskSignUp(task.id, currentUser!.id)
     toast.info('Cancelled task sign-up')
+  }
+
+  const handleJoinWaitlist = () => {
+    joinWaitlist(task.id, currentUser!.id)
+    toast.success('Joined the waitlist!')
+  }
+
+  const handleLeaveWaitlist = () => {
+    leaveWaitlist(task.id, currentUser!.id)
+    toast.info('Left the waitlist')
   }
 
   return (
@@ -85,18 +97,27 @@ export default function VolunteerTaskDetail() {
 
         <div className="space-y-6">
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-6 space-y-3">
               {isSignedUp ? (
                 <Button variant="outline" className="w-full" onClick={handleCancel}>
                   Cancel Sign-up
                 </Button>
+              ) : isOnWaitlist ? (
+                <>
+                  <p className="text-sm text-center text-muted-foreground">
+                    You're #{waitlistPosition} on the waitlist
+                  </p>
+                  <Button variant="outline" className="w-full" onClick={handleLeaveWaitlist}>
+                    Leave Waitlist
+                  </Button>
+                </>
               ) : spotsLeft > 0 ? (
                 <Button className="w-full" onClick={handleSignUp}>
                   Sign Up for Task
                 </Button>
               ) : (
-                <Button className="w-full" disabled>
-                  No spots available
+                <Button className="w-full" variant="secondary" onClick={handleJoinWaitlist}>
+                  Join Waitlist
                 </Button>
               )}
             </CardContent>

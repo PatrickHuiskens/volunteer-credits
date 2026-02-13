@@ -14,6 +14,8 @@ import AdminMembers from '@/pages/admin/AdminMembers'
 import AdminMemberDetail from '@/pages/admin/AdminMemberDetail'
 import AdminTransactions from '@/pages/admin/AdminTransactions'
 import AdminSettings from '@/pages/admin/AdminSettings'
+import MyAvailability from '@/pages/volunteer/MyAvailability'
+import AdminTemplates from '@/pages/admin/AdminTemplates'
 import Agenda from '@/pages/shared/Agenda'
 
 export const routes: RouteObject[] = [
@@ -28,6 +30,7 @@ export const routes: RouteObject[] = [
       { index: true, element: <VolunteerDashboard /> },
       { path: 'tasks', element: <VolunteerTasks /> },
       { path: 'tasks/:id', element: <VolunteerTaskDetail /> },
+      { path: 'availability', element: <MyAvailability /> },
       { path: 'agenda', element: <Agenda /> },
       { path: 'shop', element: <CreditShop /> },
       { path: 'transactions', element: <TransactionHistory /> },
@@ -41,6 +44,7 @@ export const routes: RouteObject[] = [
       { index: true, element: <AdminDashboard /> },
       { path: 'tasks', element: <AdminTasks /> },
       { path: 'tasks/:id', element: <AdminTaskDetail /> },
+      { path: 'templates', element: <AdminTemplates /> },
       { path: 'agenda', element: <Agenda /> },
       { path: 'members', element: <AdminMembers /> },
       { path: 'members/:id', element: <AdminMemberDetail /> },

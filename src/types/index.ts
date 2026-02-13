@@ -66,6 +66,7 @@ export interface Task {
   status: TaskStatus
   maxVolunteers: number
   assignedVolunteerIds: string[]
+  waitlistVolunteerIds: string[]
 }
 
 export interface Transaction {
@@ -113,4 +114,35 @@ export interface Notification {
   read: boolean
   date: string
   type: 'task' | 'credit' | 'shop' | 'system'
+}
+
+export type TimeSlot = 'morning' | 'afternoon' | 'evening'
+
+export interface Availability {
+  id: string
+  volunteerId: string
+  dayOfWeek: number // 0=Mon..6=Sun
+  timeSlot: TimeSlot
+}
+
+export interface TaskTemplate {
+  id: string
+  title: string
+  description: string
+  category: TaskCategory
+  creditReward: number
+  startTime: string
+  endTime: string
+  location: string
+  maxVolunteers: number
+  recurrence: 'weekly' | 'biweekly' | 'monthly' | 'none'
+}
+
+export interface Announcement {
+  id: string
+  title: string
+  content: string
+  authorId: string
+  date: string
+  isPinned: boolean
 }

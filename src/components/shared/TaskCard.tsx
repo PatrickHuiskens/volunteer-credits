@@ -11,12 +11,16 @@ interface TaskCardProps {
   task: Task
   showSignUp?: boolean
   isSignedUp?: boolean
+  isOnWaitlist?: boolean
+  waitlistPosition?: number
   onSignUp?: () => void
   onCancel?: () => void
+  onJoinWaitlist?: () => void
+  onLeaveWaitlist?: () => void
   onClick?: () => void
 }
 
-export function TaskCard({ task, showSignUp, isSignedUp, onSignUp, onCancel, onClick }: TaskCardProps) {
+export function TaskCard({ task, showSignUp, isSignedUp, isOnWaitlist, waitlistPosition, onSignUp, onCancel, onJoinWaitlist, onLeaveWaitlist, onClick }: TaskCardProps) {
   const category = CATEGORY_CONFIG[task.category]
   const spotsLeft = task.maxVolunteers - task.assignedVolunteerIds.length
   const CategoryIcon = category.icon
@@ -66,6 +70,14 @@ export function TaskCard({ task, showSignUp, isSignedUp, onSignUp, onCancel, onC
                 >
                   Cancel
                 </Button>
+              ) : isOnWaitlist ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => { e.stopPropagation(); onLeaveWaitlist?.() }}
+                >
+                  Leave Waitlist {waitlistPosition ? `(#${waitlistPosition})` : ''}
+                </Button>
               ) : spotsLeft > 0 ? (
                 <Button
                   size="sm"
@@ -74,7 +86,13 @@ export function TaskCard({ task, showSignUp, isSignedUp, onSignUp, onCancel, onC
                   Sign Up
                 </Button>
               ) : (
-                <Badge variant="secondary">Full</Badge>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={(e) => { e.stopPropagation(); onJoinWaitlist?.() }}
+                >
+                  Join Waitlist
+                </Button>
               )}
             </div>
           )}

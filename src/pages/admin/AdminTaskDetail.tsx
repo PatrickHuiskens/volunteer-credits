@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router'
 import { ArrowLeft, Calendar, Clock, MapPin, Users, UserPlus, CheckCircle } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -14,13 +14,27 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { useData } from '@/hooks/useData'
 import { CATEGORY_CONFIG, STATUS_CONFIG } from '@/lib/constants'
 import { formatDate, cn } from '@/lib/utils'
-import { TaskStatus } from '@/types'
+import { TaskStatus, type TimeSlot } from '@/types'
 import { toast } from 'sonner'
+
+function getTimeSlotFromHour(time: string): TimeSlot {
+  const hour = parseInt(time.split(':')[0], 10)
+  if (hour < 12) return 'morning'
+  if (hour < 17) return 'afternoon'
+  return 'evening'
+}
+
+function getDayOfWeek(dateStr: string): number {
+  const date = new Date(dateStr)
+  // JS getDay: 0=Sun, we want 0=Mon
+  const day = date.getDay()
+  return day === 0 ? 6 : day - 1
+}
 
 export default function AdminTaskDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { tasks, volunteers, signUpForTask, cancelTaskSignUp, completeTask } = useData()
+  const { tasks, volunteers, signUpForTask, cancelTaskSignUp, completeTask, getAvailableVolunteers } = useData()
   const [assignOpen, setAssignOpen] = useState(false)
   const [completeOpen, setCompleteOpen] = useState(false)
   const [selectedVol, setSelectedVol] = useState('')
@@ -32,8 +46,17 @@ export default function AdminTaskDetail() {
   const status = STATUS_CONFIG[task.status]
   const CategoryIcon = category.icon
   const assignedVols = volunteers.filter((v) => task.assignedVolunteerIds.includes(v.id))
+  const waitlistedVols = volunteers.filter((v) => task.waitlistVolunteerIds.includes(v.id))
   const availableVols = volunteers.filter((v) => !task.assignedVolunteerIds.includes(v.id))
   const spotsLeft = task.maxVolunteers - task.assignedVolunteerIds.length
+
+  // Compute availability for this task's day/time
+  const taskDayOfWeek = getDayOfWeek(task.date)
+  const taskTimeSlot = getTimeSlotFromHour(task.startTime)
+  const availableVolIds = useMemo(
+    () => getAvailableVolunteers(taskDayOfWeek, taskTimeSlot),
+    [getAvailableVolunteers, taskDayOfWeek, taskTimeSlot]
+  )
 
   const handleAssign = () => {
     if (!selectedVol) return
@@ -150,7 +173,8 @@ export default function AdminTaskDetail() {
                         variant="ghost"
                         size="sm"
                         className="text-xs text-destructive"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation()
                           cancelTaskSignUp(task.id, v.id)
                           toast.info('Volunteer removed')
                         }}
@@ -163,6 +187,31 @@ export default function AdminTaskDetail() {
               )}
             </CardContent>
           </Card>
+
+          {/* Waitlist Section */}
+          {waitlistedVols.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Waitlist ({waitlistedVols.length})</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {waitlistedVols.map((v, idx) => (
+                  <div key={v.id} className="flex items-center gap-3 rounded-lg p-2 -mx-2">
+                    <span className="text-xs font-bold text-muted-foreground w-4">#{idx + 1}</span>
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="text-xs">
+                        {v.firstName[0]}
+                        {v.lastName[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm">
+                      {v.firstName} {v.lastName}
+                    </span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
 
@@ -178,13 +227,27 @@ export default function AdminTaskDetail() {
                 <SelectValue placeholder="Choose a volunteer..." />
               </SelectTrigger>
               <SelectContent>
-                {availableVols.map((v) => (
-                  <SelectItem key={v.id} value={v.id}>
-                    {v.firstName} {v.lastName}
-                  </SelectItem>
-                ))}
+                {availableVols.map((v) => {
+                  const isAvailable = availableVolIds.includes(v.id)
+                  return (
+                    <SelectItem key={v.id} value={v.id}>
+                      <span className="flex items-center gap-2">
+                        <span
+                          className={cn(
+                            'h-2 w-2 rounded-full shrink-0',
+                            isAvailable ? 'bg-green-500' : 'bg-gray-300'
+                          )}
+                        />
+                        {v.firstName} {v.lastName}
+                      </span>
+                    </SelectItem>
+                  )
+                })}
               </SelectContent>
             </Select>
+            <p className="text-xs text-muted-foreground">
+              Green dot = available on this day/time
+            </p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setAssignOpen(false)}>

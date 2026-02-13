@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router'
-import { Wallet, TrendingUp, TrendingDown, ArrowRight } from 'lucide-react'
+import { Wallet, TrendingUp, TrendingDown, ArrowRight, Pin, Megaphone } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { StatCard } from '@/components/shared/StatCard'
@@ -12,7 +12,7 @@ import { TaskStatus, type Volunteer } from '@/types'
 
 export default function VolunteerDashboard() {
   const { currentUser } = useAuth()
-  const { tasks, getUserTransactions, cancelTaskSignUp } = useData()
+  const { tasks, getUserTransactions, cancelTaskSignUp, announcements, volunteers } = useData()
   const navigate = useNavigate()
 
   const volunteer = currentUser as Volunteer
@@ -26,8 +26,40 @@ export default function VolunteerDashboard() {
     )
     .slice(0, 3)
 
+  const pinnedAnnouncements = announcements.filter((a) => a.isPinned)
+  const regularAnnouncements = announcements.filter((a) => !a.isPinned).slice(0, 3)
+  const displayedAnnouncements = [...pinnedAnnouncements, ...regularAnnouncements].slice(0, 5)
+
   return (
     <div className="space-y-6">
+      {displayedAnnouncements.length > 0 && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Megaphone className="h-4 w-4" />
+              Announcements
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {displayedAnnouncements.map((ann) => {
+              const author = [...volunteers].find((v) => v.id === ann.authorId) ?? { firstName: 'Admin', lastName: '' }
+              return (
+                <div key={ann.id} className="rounded-lg border p-3 space-y-1">
+                  <div className="flex items-center gap-2">
+                    {ann.isPinned && <Pin className="h-3.5 w-3.5 text-amber-600" />}
+                    <h4 className="text-sm font-semibold">{ann.title}</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground line-clamp-2">{ann.content}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {author.firstName} {author.lastName} · {formatDate(ann.date)}
+                  </p>
+                </div>
+              )
+            })}
+          </CardContent>
+        </Card>
+      )}
+
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard icon={Wallet} label="Credit Balance" value={`${volunteer.creditBalance} CR`} />
         <StatCard

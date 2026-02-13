@@ -31,10 +31,11 @@ const defaultTask = {
   status: TaskStatus.OPEN,
   maxVolunteers: 3,
   assignedVolunteerIds: [] as string[],
+  waitlistVolunteerIds: [] as string[],
 }
 
 export default function AdminTasks() {
-  const { tasks, createTask, updateTask, deleteTask } = useData()
+  const { tasks, createTask, updateTask, deleteTask, createTemplate } = useData()
   const navigate = useNavigate()
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
@@ -69,6 +70,25 @@ export default function AdminTasks() {
       toast.success('Task updated!')
     }
     setEditTask(null)
+  }
+
+  const handleSaveAsTemplate = () => {
+    if (!editTask?.title) {
+      toast.error('Please fill in at least the title')
+      return
+    }
+    createTemplate({
+      title: editTask.title ?? '',
+      description: editTask.description ?? '',
+      category: editTask.category ?? TaskCategory.BAR,
+      creditReward: editTask.creditReward ?? 10,
+      startTime: editTask.startTime ?? '09:00',
+      endTime: editTask.endTime ?? '17:00',
+      location: editTask.location ?? '',
+      maxVolunteers: editTask.maxVolunteers ?? 3,
+      recurrence: 'none',
+    })
+    toast.success('Saved as template!')
   }
 
   const handleDelete = () => {
@@ -280,7 +300,10 @@ export default function AdminTasks() {
               </div>
             </div>
           )}
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button variant="ghost" size="sm" onClick={handleSaveAsTemplate} className="mr-auto">
+              Save as Template
+            </Button>
             <Button variant="outline" onClick={() => setEditTask(null)}>
               Cancel
             </Button>

@@ -8,11 +8,13 @@ import {
   LayoutDashboard,
   ListTodo,
   CalendarDays,
+  CalendarCheck,
   ShoppingBag,
   Receipt,
   UserCircle,
   Users,
   Settings,
+  Copy,
   type LucideIcon,
 } from 'lucide-react'
 import { TaskCategory, TaskStatus, ShopItemCategory } from '@/types'
@@ -125,6 +127,7 @@ export interface NavItem {
 export const VOLUNTEER_NAV: NavItem[] = [
   { title: 'Dashboard', url: '/volunteer', icon: LayoutDashboard },
   { title: 'Tasks', url: '/volunteer/tasks', icon: ListTodo },
+  { title: 'Availability', url: '/volunteer/availability', icon: CalendarCheck },
   { title: 'Agenda', url: '/volunteer/agenda', icon: CalendarDays },
   { title: 'Shop', url: '/volunteer/shop', icon: ShoppingBag },
   { title: 'Transactions', url: '/volunteer/transactions', icon: Receipt },
@@ -134,6 +137,7 @@ export const VOLUNTEER_NAV: NavItem[] = [
 export const ADMIN_NAV: NavItem[] = [
   { title: 'Dashboard', url: '/admin', icon: LayoutDashboard },
   { title: 'Tasks', url: '/admin/tasks', icon: ListTodo },
+  { title: 'Templates', url: '/admin/templates', icon: Copy },
   { title: 'Agenda', url: '/admin/agenda', icon: CalendarDays },
   { title: 'Members', url: '/admin/members', icon: Users },
   { title: 'Transactions', url: '/admin/transactions', icon: Receipt },

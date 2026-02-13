@@ -1,11 +1,14 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
-import type { Task, Transaction, ShopItem, Club, Volunteer, Notification } from '@/types'
-import { TransactionType, TaskStatus } from '@/types'
+import type { Task, Transaction, ShopItem, Club, Volunteer, Notification, Availability, TaskTemplate, Announcement } from '@/types'
+import { TransactionType, TaskStatus, type TimeSlot } from '@/types'
 import { mockTasks } from '@/data/mock-tasks'
 import { mockTransactions } from '@/data/mock-transactions'
 import { mockShopItems } from '@/data/mock-shop-items'
 import { mockClub } from '@/data/mock-club'
 import { mockVolunteers } from '@/data/mock-users'
+import { mockAvailability } from '@/data/mock-availability'
+import { mockTemplates } from '@/data/mock-templates'
+import { mockAnnouncements } from '@/data/mock-announcements'
 
 interface DataContextType {
   tasks: Task[]
@@ -14,6 +17,9 @@ interface DataContextType {
   club: Club
   volunteers: Volunteer[]
   notifications: Notification[]
+  availability: Availability[]
+  taskTemplates: TaskTemplate[]
+  announcements: Announcement[]
   signUpForTask: (taskId: string, volunteerId: string) => void
   cancelTaskSignUp: (taskId: string, volunteerId: string) => void
   redeemShopItem: (itemId: string, userId: string) => void
@@ -26,6 +32,21 @@ interface DataContextType {
   markNotificationRead: (notificationId: string) => void
   getUserTransactions: (userId: string) => Transaction[]
   getUserTasks: (userId: string) => Task[]
+  // Availability
+  toggleAvailability: (volunteerId: string, dayOfWeek: number, timeSlot: TimeSlot) => void
+  getVolunteerAvailability: (volunteerId: string) => Availability[]
+  getAvailableVolunteers: (dayOfWeek: number, timeSlot: TimeSlot) => string[]
+  // Templates
+  createTemplate: (template: Omit<TaskTemplate, 'id'>) => void
+  deleteTemplate: (id: string) => void
+  generateFromTemplate: (templateId: string, dates: string[]) => void
+  // Announcements
+  createAnnouncement: (announcement: Omit<Announcement, 'id'>) => void
+  deleteAnnouncement: (id: string) => void
+  togglePinAnnouncement: (id: string) => void
+  // Waitlist
+  joinWaitlist: (taskId: string, volunteerId: string) => void
+  leaveWaitlist: (taskId: string, volunteerId: string) => void
 }
 
 const DataContext = createContext<DataContextType | null>(null)
@@ -45,6 +66,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [club, setClub] = useState<Club>(mockClub)
   const [volunteers, setVolunteers] = useState<Volunteer[]>(mockVolunteers)
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications)
+  const [availability, setAvailability] = useState<Availability[]>(mockAvailability)
+  const [taskTemplates, setTaskTemplates] = useState<TaskTemplate[]>(mockTemplates)
+  const [announcements, setAnnouncements] = useState<Announcement[]>(mockAnnouncements)
 
   const signUpForTask = useCallback((taskId: string, volunteerId: string) => {
     setTasks((prev) =>
@@ -58,11 +82,33 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const cancelTaskSignUp = useCallback((taskId: string, volunteerId: string) => {
     setTasks((prev) =>
-      prev.map((t) =>
-        t.id === taskId
-          ? { ...t, assignedVolunteerIds: t.assignedVolunteerIds.filter((id) => id !== volunteerId) }
-          : t
-      )
+      prev.map((t) => {
+        if (t.id !== taskId) return t
+        const newAssigned = t.assignedVolunteerIds.filter((id) => id !== volunteerId)
+        // Auto-fill from waitlist if someone cancels and there's a waitlisted volunteer
+        if (t.waitlistVolunteerIds.length > 0 && newAssigned.length < t.maxVolunteers) {
+          const [promoted, ...remainingWaitlist] = t.waitlistVolunteerIds
+          // Create notification for the promoted volunteer
+          setNotifications((nPrev) => [
+            ...nPrev,
+            {
+              id: `notif-${Date.now()}`,
+              userId: promoted,
+              title: 'Waitlist promotion',
+              message: `You have been assigned to "${t.title}" from the waitlist!`,
+              read: false,
+              date: new Date().toISOString(),
+              type: 'task',
+            },
+          ])
+          return {
+            ...t,
+            assignedVolunteerIds: [...newAssigned, promoted],
+            waitlistVolunteerIds: remainingWaitlist,
+          }
+        }
+        return { ...t, assignedVolunteerIds: newAssigned }
+      })
     )
   }, [])
 
@@ -176,6 +222,101 @@ export function DataProvider({ children }: { children: ReactNode }) {
     [tasks]
   )
 
+  // Availability
+  const toggleAvailability = useCallback((volunteerId: string, dayOfWeek: number, timeSlot: TimeSlot) => {
+    setAvailability((prev) => {
+      const existing = prev.find(
+        (a) => a.volunteerId === volunteerId && a.dayOfWeek === dayOfWeek && a.timeSlot === timeSlot
+      )
+      if (existing) {
+        return prev.filter((a) => a.id !== existing.id)
+      }
+      return [...prev, { id: `avail-${Date.now()}`, volunteerId, dayOfWeek, timeSlot }]
+    })
+  }, [])
+
+  const getVolunteerAvailability = useCallback(
+    (volunteerId: string) => availability.filter((a) => a.volunteerId === volunteerId),
+    [availability]
+  )
+
+  const getAvailableVolunteers = useCallback(
+    (dayOfWeek: number, timeSlot: TimeSlot) =>
+      availability.filter((a) => a.dayOfWeek === dayOfWeek && a.timeSlot === timeSlot).map((a) => a.volunteerId),
+    [availability]
+  )
+
+  // Templates
+  const createTemplate = useCallback((template: Omit<TaskTemplate, 'id'>) => {
+    setTaskTemplates((prev) => [...prev, { ...template, id: `tmpl-${Date.now()}` }])
+  }, [])
+
+  const deleteTemplate = useCallback((id: string) => {
+    setTaskTemplates((prev) => prev.filter((t) => t.id !== id))
+  }, [])
+
+  const generateFromTemplate = useCallback((templateId: string, dates: string[]) => {
+    setTaskTemplates((prev) => {
+      const template = prev.find((t) => t.id === templateId)
+      if (!template) return prev
+      const newTasks: Task[] = dates.map((date) => ({
+        id: `task-${Date.now()}-${date}`,
+        title: template.title,
+        description: template.description,
+        category: template.category,
+        creditReward: template.creditReward,
+        date,
+        startTime: template.startTime,
+        endTime: template.endTime,
+        location: template.location,
+        status: TaskStatus.OPEN,
+        maxVolunteers: template.maxVolunteers,
+        assignedVolunteerIds: [],
+        waitlistVolunteerIds: [],
+      }))
+      setTasks((tPrev) => [...newTasks, ...tPrev])
+      return prev
+    })
+  }, [])
+
+  // Announcements
+  const createAnnouncement = useCallback((announcement: Omit<Announcement, 'id'>) => {
+    setAnnouncements((prev) => [{ ...announcement, id: `ann-${Date.now()}` }, ...prev])
+  }, [])
+
+  const deleteAnnouncement = useCallback((id: string) => {
+    setAnnouncements((prev) => prev.filter((a) => a.id !== id))
+  }, [])
+
+  const togglePinAnnouncement = useCallback((id: string) => {
+    setAnnouncements((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, isPinned: !a.isPinned } : a))
+    )
+  }, [])
+
+  // Waitlist
+  const joinWaitlist = useCallback((taskId: string, volunteerId: string) => {
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === taskId &&
+        !t.waitlistVolunteerIds.includes(volunteerId) &&
+        !t.assignedVolunteerIds.includes(volunteerId)
+          ? { ...t, waitlistVolunteerIds: [...t.waitlistVolunteerIds, volunteerId] }
+          : t
+      )
+    )
+  }, [])
+
+  const leaveWaitlist = useCallback((taskId: string, volunteerId: string) => {
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === taskId
+          ? { ...t, waitlistVolunteerIds: t.waitlistVolunteerIds.filter((id) => id !== volunteerId) }
+          : t
+      )
+    )
+  }, [])
+
   return (
     <DataContext.Provider
       value={{
@@ -185,6 +326,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         club,
         volunteers,
         notifications,
+        availability,
+        taskTemplates,
+        announcements,
         signUpForTask,
         cancelTaskSignUp,
         redeemShopItem,
@@ -197,6 +341,17 @@ export function DataProvider({ children }: { children: ReactNode }) {
         markNotificationRead,
         getUserTransactions,
         getUserTasks,
+        toggleAvailability,
+        getVolunteerAvailability,
+        getAvailableVolunteers,
+        createTemplate,
+        deleteTemplate,
+        generateFromTemplate,
+        createAnnouncement,
+        deleteAnnouncement,
+        togglePinAnnouncement,
+        joinWaitlist,
+        leaveWaitlist,
       }}
     >
       {children}

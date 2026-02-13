@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { CreditBadge } from '@/components/shared/CreditBadge'
+import { FairnessBadge } from '@/components/shared/FairnessBadge'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { useData } from '@/hooks/useData'
 import { formatDate } from '@/lib/utils'
@@ -19,6 +20,10 @@ export default function AdminMembers() {
   const filtered = volunteers.filter((v) =>
     `${v.firstName} ${v.lastName} ${v.email}`.toLowerCase().includes(search.toLowerCase())
   )
+
+  const avgTasks = volunteers.length > 0
+    ? volunteers.reduce((sum, v) => sum + v.tasksCompleted, 0) / volunteers.length
+    : 0
 
   return (
     <div className="space-y-6">
@@ -46,6 +51,7 @@ export default function AdminMembers() {
                 <TableHead>Role</TableHead>
                 <TableHead>Balance</TableHead>
                 <TableHead>Tasks Done</TableHead>
+                <TableHead>Fairness</TableHead>
                 <TableHead>Joined</TableHead>
               </TableRow>
             </TableHeader>
@@ -79,6 +85,9 @@ export default function AdminMembers() {
                     <CreditBadge amount={v.creditBalance} size="sm" />
                   </TableCell>
                   <TableCell className="text-sm">{v.tasksCompleted}</TableCell>
+                  <TableCell>
+                    <FairnessBadge tasksCompleted={v.tasksCompleted} average={avgTasks} />
+                  </TableCell>
                   <TableCell className="text-sm">{formatDate(v.joinedDate)}</TableCell>
                 </TableRow>
               ))}
